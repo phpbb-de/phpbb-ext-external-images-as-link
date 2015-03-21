@@ -1,0 +1,8 @@
+services:
+    phpbbde.externalimgaslink.listener:
+        class: phpbbde\externalimgaslink\event\listener
+        arguments:
+            - @user
+            - @template
+        tags:
+            - { name: event.listener }
