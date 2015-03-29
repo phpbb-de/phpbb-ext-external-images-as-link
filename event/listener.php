@@ -28,7 +28,7 @@ class listener implements EventSubscriberInterface
 	/**
 	* Constructor
 	*
-	* @param \phpbb\controller\helper			$helper			Controller helper object
+	* @param \phpbb\user $user, \phpbb\template\template $template
 	*/
 	public function __construct(\phpbb\user $user, \phpbb\template\template $template)
 	{
@@ -50,15 +50,10 @@ class listener implements EventSubscriberInterface
 		);
 	}
 
-	/**
-	* Add configuration items for ppp-extension to ACP
-	*
-	* @param object	$event The event object
-	* @return null
-	* @access public
-	*/
 	public function modify_case_img($event)
 	{
+		$extimgaslink_boardurl = generate_board_url(); 
+
 		$this->user->add_lang_ext('phpbbde/externalimgaslink', 'extimgaslink');
 
 		$bbcode_cache = $event['bbcode_cache'];
@@ -77,10 +72,10 @@ class listener implements EventSubscriberInterface
 		{
 			$bbcode_cache[$bbcode_id] = array(
 				'preg' => array(
-				//nur Bilder von phpBB.de direkt anzeigen
-				'#\[img:$uid\](https://www\.phpbb\.de/.*?)\[/img:$uid\]#s'	=> $bbcode->bbcode_tpl('img', $bbcode_id),
-				//alle anderen durch [ externes Bild ] ersetzen
-				'#\[img:$uid\](.*?)\[/img:$uid\]#s' 	=> str_replace('$2', '[ externes Bild ]', $bbcode->bbcode_tpl('url', $bbcode_id, true)),
+					// display only images from own board-url
+					'#\[img:$uid\]('. $extimgaslink_boardurl . '/.*?)\[/img:$uid\]#s'	=> $bbcode->bbcode_tpl('img', $bbcode_id),
+					// every other external picture will be replaced
+					'#\[img:$uid\](.*?)\[/img:$uid\]#s' 	=> str_replace('$2', $this->user->lang['EXTIMGLINK'], $bbcode->bbcode_tpl('url', $bbcode_id, true)),
 				)
 			);
 		}
