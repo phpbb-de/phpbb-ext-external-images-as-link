@@ -4,13 +4,19 @@
 	"description": "Displays every image as a link, which is included with [img] bbcode.",
 	"homepage": "https://github.com/phpbb-de/phpbb-ext-external-images-as-link",
 	"version": "1.0.0",
-	"time": "2015-03-21",
+	"time": "2015-04-08",
 	"license": "GPL-2.0",
 	"authors": [
 		{
 			"name": "Christian Schnegelberger",
 			"email": "blackhawk87@phpbb.de",
 			"homepage": "https://www.phpbb.de",
+			"role": "Developer"
+		},
+		{
+			"name": "Oliver Schramm",
+			"email": "elsensee@phpbb.de",
+			"homepage": "https://github.com/Elsensee",
 			"role": "Developer"
 		}
 	],
@@ -20,7 +26,7 @@
 	"extra": {
 		"display-name": "phpBB.de - External Image as Link",
 		"soft-require": {
-			"phpbb/phpbb": "=>3.1.3"
+			"phpbb/phpbb": ">=3.1.3"
 		}
 	}
 }

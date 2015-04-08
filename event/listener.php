@@ -62,7 +62,7 @@ class listener implements EventSubscriberInterface
 	 */
 	public function modify_case_img($event)
 	{
-		$bbcode_id = 4; // [img] is case 4
+		$bbcode_id = 4; // [img] has bbcode_id 4 hardcoded
 		$bbcode_cache = $event['bbcode_cache'];
 
 		if (!isset($bbcode_cache[$bbcode_id]) || !$this->user->optionget('viewimg'))
@@ -73,6 +73,7 @@ class listener implements EventSubscriberInterface
 		$this->template->set_filenames(array('bbcode.html' => 'bbcode.html'));
 
 		$bbcode = new \bbcode();
+		// We need these otherwise we cannot use $bbcode->bbcode_tpl()
 		$bbcode->template_bitfield = new \bitfield($this->user->style['bbcode_bitfield']);
 		$bbcode->template_filename = $this->template->get_source_file_for_handle('bbcode.html');
 
@@ -80,9 +81,9 @@ class listener implements EventSubscriberInterface
 
 		$bbcode_cache[$bbcode_id] = array(
 			'preg' => array(
-				// display only images from own board-url
+				// display only images from own board url
 				'#\[img:$uid\]('. preg_quote($extimgaslink_boardurl, '#') . '.*?)\[/img:$uid\]#s'	=> $bbcode->bbcode_tpl('img', $bbcode_id),
-				// every other external picture will be replaced
+				// every other external image will be replaced
 				'#\[img:$uid\](.*?)\[/img:$uid\]#s' 	=> str_replace('$2', $this->user->lang('EXTIMGLINK'), $bbcode->bbcode_tpl('url', $bbcode_id, true)),
 			)
 		);
