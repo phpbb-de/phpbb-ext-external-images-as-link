@@ -34,6 +34,8 @@ class listener implements EventSubscriberInterface
 	{
 		$this->user = $user;
 		$this->template = $template;
+
+		$this->user->add_lang_ext('phpbbde/externalimgaslink', 'extimgaslink');
 	}
 
 	/**
@@ -50,35 +52,40 @@ class listener implements EventSubscriberInterface
 		);
 	}
 
+
+	/**
+	 * Changes the regex replacement for second pass
+	 *
+	 * @param object $event
+	 * @return null
+	 * @access public
+	 */
 	public function modify_case_img($event)
 	{
-		$extimgaslink_boardurl = generate_board_url(); 
-
-		$this->user->add_lang_ext('phpbbde/externalimgaslink', 'extimgaslink');
-
+		$bbcode_id = 4; // [img] is case 4
 		$bbcode_cache = $event['bbcode_cache'];
 
-		$bbcode_id = 4 ; // [img] is case 4
-
-		$bbcode = new \bbcode();
-
-		$bbcode->template_bitfield = new \bitfield($this->user->style['bbcode_bitfield']);
+		if (!isset($bbcode_cache[$bbcode_id]) || !$this->user->optionget('viewimg'))
+		{
+			return;
+		}
 
 		$this->template->set_filenames(array('bbcode.html' => 'bbcode.html'));
 
+		$bbcode = new \bbcode();
+		$bbcode->template_bitfield = new \bitfield($this->user->style['bbcode_bitfield']);
 		$bbcode->template_filename = $this->template->get_source_file_for_handle('bbcode.html');
 
-		if ($this->user->optionget('viewimg'))
-		{
-			$bbcode_cache[$bbcode_id] = array(
-				'preg' => array(
-					// display only images from own board-url
-					'#\[img:$uid\]('. $extimgaslink_boardurl . '/.*?)\[/img:$uid\]#s'	=> $bbcode->bbcode_tpl('img', $bbcode_id),
-					// every other external picture will be replaced
-					'#\[img:$uid\](.*?)\[/img:$uid\]#s' 	=> str_replace('$2', $this->user->lang['EXTIMGLINK'], $bbcode->bbcode_tpl('url', $bbcode_id, true)),
-				)
-			);
-		}
+		$extimgaslink_boardurl = generate_board_url() . '/';
+
+		$bbcode_cache[$bbcode_id] = array(
+			'preg' => array(
+				// display only images from own board-url
+				'#\[img:$uid\]('. preg_quote($extimgaslink_boardurl, '#') . '.*?)\[/img:$uid\]#s'	=> $bbcode->bbcode_tpl('img', $bbcode_id),
+				// every other external picture will be replaced
+				'#\[img:$uid\](.*?)\[/img:$uid\]#s' 	=> str_replace('$2', $this->user->lang('EXTIMGLINK'), $bbcode->bbcode_tpl('url', $bbcode_id, true)),
+			)
+		);
 
 		$event['bbcode_cache'] = $bbcode_cache;
 	}
