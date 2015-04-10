@@ -4,7 +4,7 @@
 	"description": "Displays every image as a link, which is included with [img] bbcode.",
 	"homepage": "https://github.com/phpbb-de/phpbb-ext-external-images-as-link",
 	"version": "1.0.0",
-	"time": "2015-04-08",
+	"time": "2015-04-10",
 	"license": "GPL-2.0",
 	"authors": [
 		{
@@ -16,7 +16,7 @@
 		{
 			"name": "Oliver Schramm",
 			"email": "elsensee@phpbb.de",
-			"homepage": "https://github.com/Elsensee",
+			"homepage": "https://www.phpbb.de",
 			"role": "Developer"
 		}
 	],
