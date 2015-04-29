@@ -1,16 +1,24 @@
 # phpBB 3.1 Extension - phpBB.de External Images as Link
 
-## Installation
+Images which are not from the own board are displayed as link not as image.
 
-Clone into ext/phpbbde/externalimgaslink:
+Author: Christian Schnegelberger, Oliver Schramm
 
-    git clone https://github.com/phpbb-de/phpbb-ext-external-images-as-link ext/phpbbde/externalimgaslink
+URL: https://www.phpbb.de
 
-Go to "ACP" > "Customise" > "Extensions" and enable the "phpBB.de External Images as Link" extension.
+Version: 1.0.0
 
-## Development
+## Install instructions:
+1. Download the extension
+2. Copy the whole archive content to: phpBB/phpbbde/externalimgaslink
+3. Go to your phpBB-Board > Admin Control Panel > Customise > Manage extensions > phpBB.de - External Images as Link: enable
 
-If you find a bug, please report it on https://github.com/phpbb-de/phpbb-ext-external-images-as-link
+## Update instructions:
+1. Go to you phpBB-Board > Admin Control Panel > Customise > Manage extensions > phpBB.de - External Images as Link: disable
+2. Delete all files of the extension from phpBB/phpbbde/externalimgaslink
+3. Upload all the new files to the same locations
+4. Go to you phpBB-Board > Admin Control Panel > Customise > Manage extensions > phpBB.de - External Images as Link: enable
+5. Purge the board cache
 
 ## License
 

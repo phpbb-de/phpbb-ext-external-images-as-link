@@ -1,10 +1,10 @@
 {
 	"name": "phpbbde/externalimgaslink",
 	"type": "phpbb-extension",
-	"description": "Displays every image as a link, which is included with [img] bbcode.",
+	"description": "Displays every image as a link, which is included with [img] bbcode and not hosted with the own board.",
 	"homepage": "https://github.com/phpbb-de/phpbb-ext-external-images-as-link",
 	"version": "1.0.0",
-	"time": "2015-04-10",
+	"time": "2015-04-29",
 	"license": "GPL-2.0",
 	"authors": [
 		{
