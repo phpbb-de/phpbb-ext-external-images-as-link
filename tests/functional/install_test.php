@@ -2,8 +2,8 @@
 
 /**
 *
-* @package phpBB.de Pastebin
-* @copyright (c) 2014 phpBB.de
+* @package phpBB.de External Images as link
+* @copyright (c) 2015 phpBB.de
 * @license http://opensource.org/licenses/gpl-2.0.php GNU General Public License v2
 *
 */
