@@ -24,7 +24,7 @@ Version: 1.0.0
 
 We use automated unit tests to prevent regressions. Check out our travis build below:
 
-master: [![Build Status](https://travis-ci.org/phpbb-de/phpbb-ext-external-img-as-link.png?branch=master)](http://travis-ci.org/phpbb-de/phpbb-ext-external-img-as-link)
+master: [![Build Status](https://travis-ci.org/phpbb-de/phpbb-ext-external-images-as-link.png?branch=master)](http://travis-ci.org/phpbb-de/phpbb-ext-external-images-as-link)
 
 ## License
 
