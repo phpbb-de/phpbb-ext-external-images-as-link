@@ -77,7 +77,7 @@ class listener implements EventSubscriberInterface
 		$bbcode->template_bitfield = new \bitfield($this->user->style['bbcode_bitfield']);
 		$bbcode->template_filename = $this->template->get_source_file_for_handle('bbcode.html');
 
-		$extimgaslink_boardurl = generate_board_url() . '/';
+		$extimgaslink_boardurl = generate_board_url(true) . '/';
 
 		$bbcode_cache[$bbcode_id] = array(
 			'preg' => array(
