@@ -23,11 +23,11 @@ if (empty($lang) || !is_array($lang))
 }
 
 $lang = array_merge($lang, array(
-	'EXTIMGASLINK_CONFIG'			=> 'Allowed origin from images used in posts',
-	'EXTIMGASLINK_CONFIG_EXPLAIN'	=> 'Other images are replaced with links.',
-	'EXTIMGASLINK_INVALID_CONFIG'	=> 'The origin you specified is not valid.',
-	'EXTIMGASLINK_SECURE_SITES'		=> 'only images from secure websites and the server',
-	'EXTIMGASLINK_SERVER_ONLY'		=> 'only images from the server',
+	'EXTIMGASLINK_CONFIG'			=> 'Allowed origin of images used in posts',
+	'EXTIMGASLINK_CONFIG_EXPLAIN'	=> 'Images, that are available through a secure connection, can be additionally allowed. Any other images are replaced with links. Images, that are available on the same domain as this board, are always allowed.',
+	'EXTIMGASLINK_INVALID_CONFIG'	=> 'The origin you specified is invalid.',
+	'EXTIMGASLINK_SECURE_SITES'		=> 'only images from secure websites and this domain',
+	'EXTIMGASLINK_SERVER_ONLY'		=> 'only images from this domain',
 
 	'EXTIMGLINK'	=> '[ external image ]',
 ));
