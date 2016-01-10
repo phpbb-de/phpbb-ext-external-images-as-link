@@ -1,8 +1,15 @@
 services:
+    phpbbde.externalimgaslink.helper:
+        class: phpbbde\externalimgaslink\helper
+        arguments:
+            - '@user'
+
     phpbbde.externalimgaslink.listener:
         class: phpbbde\externalimgaslink\event\listener
         arguments:
-            - @user
-            - @template
+            - '@config'
+            - '@phpbbde.externalimgaslink.helper'
+            - '@template'
+            - '@user'
         tags:
             - { name: event.listener }

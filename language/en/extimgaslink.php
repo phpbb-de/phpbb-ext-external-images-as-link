@@ -23,5 +23,11 @@ if (empty($lang) || !is_array($lang))
 }
 
 $lang = array_merge($lang, array(
+	'EXTIMGASLINK_CONFIG'			=> 'Allowed origin from images used in posts',
+	'EXTIMGASLINK_CONFIG_EXPLAIN'	=> 'Other images are replaced with links.',
+	'EXTIMGASLINK_INVALID_CONFIG'	=> 'The origin you specified is not valid.',
+	'EXTIMGASLINK_SECURE_SITES'		=> 'only images from secure websites and the server',
+	'EXTIMGASLINK_SERVER_ONLY'		=> 'only images from the server',
+
 	'EXTIMGLINK'	=> '[ external image ]',
 ));
