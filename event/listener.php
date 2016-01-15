@@ -12,23 +12,34 @@ namespace phpbbde\externalimgaslink\event;
 /**
 * @ignore
 */
+use phpbb\config\config;
+use phpbb\template\template;
+use phpbb\user;
+use phpbbde\externalimgaslink\helper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\DependencyInjection\Container;
 
 /**
 * Event listener
 */
 class listener implements EventSubscriberInterface
 {
-	/** @var \phpbb\config\config */
+	/** @var config */
 	protected $config;
 
-	/** @var \phpbbde\externalimgaslink\helper */
+	/** @var Container */
+	protected $container;
+
+	/** @var helper */
 	protected $helper;
 
-	/** @var \phpbb\template\template */
+	/** @var template */
 	protected $template;
 
-	/** @var \phpbb\user */
+	/** @var string */
+	protected $updated;
+
+	/** @var user */
 	protected $user;
 
 	/**
@@ -38,11 +49,13 @@ class listener implements EventSubscriberInterface
 	 * @param \phpbb\template\template		$template
 	 * @param \phpbb\user					$user
 	 */
-	public function __construct(\phpbb\config\config $config, \phpbbde\externalimgaslink\helper $helper, \phpbb\template\template $template, \phpbb\user $user)
+	public function __construct(config $config, Container $container, helper $helper, template $template, user $user)
 	{
 		$this->config = $config;
+		$this->container = $container;
 		$this->helper = $helper;
 		$this->template = $template;
+		$this->updated = '';
 		$this->user = $user;
 
 		$this->user->add_lang_ext('phpbbde/externalimgaslink', 'extimgaslink');
@@ -60,7 +73,9 @@ class listener implements EventSubscriberInterface
 		return array(
 			'core.acp_board_config_edit_add'	=> 'acp_add_config',
 			'core.bbcode_cache_init_end'		=> 'modify_case_img',
-			'core.validate_config_variable'		=> 'validate_config_variable'
+			'core.validate_config_variable'		=> 'validate_config_variable',
+			// 3.2 TextFormatter event (will only trigger in >=3.2)
+			'core.text_formatter_s9e_configure_after'	=> 'configure_textformatter',
 		);
 	}
 
@@ -79,12 +94,46 @@ class listener implements EventSubscriberInterface
 		}
 
 		$own_vars = array(
-			'extimgaslink_config'	=> array('lang' => 'EXTIMGASLINK_CONFIG', 'validate' => 'extimgaslink_config', 'type' => 'select', 'function' => array($this->helper, 'extimgaslink_config_select'), 'params' => array('{CONFIG_VALUE}'), 'explain' => true),
+			'extimgaslink_config'	=> array(
+				'lang' => 'EXTIMGASLINK_CONFIG',
+				'validate' => 'extimgaslink_config',
+				'type' => 'select',
+				'function' => array($this->helper, 'extimgaslink_config_select'),
+				'params' => array('{CONFIG_VALUE}'),
+				'explain' => true
+			),
 		);
 
 		$vars = $event['display_vars'];
 		$vars['vars'] = $this->helper->array_insert($vars['vars'], 'allow_post_links', $own_vars);
 		$event['display_vars'] = $vars;
+	}
+
+	/**
+	 * Configures the textformatter
+	 *
+	 * @param \phpbb\event\data $event
+	 * @return null
+	 * @access public
+	 */
+	public function configure_textformatter($event)
+	{
+		/** @var \s9e\TextFormatter\Configurator $configurator */
+		$configurator = $event['configurator'];
+
+		$condition = 'starts-with(@src, \'' . generate_board_url(true) . '\')';
+		$setting = ($this->updated) ? $this->updated : $this->config['extimgaslink_config'];
+		$condition .= ($setting === 'SECURE_SITES') ? ' or starts-with(@src, \'https://\')' : '';
+
+		$img_template = '<xsl:choose>'
+			. '<xsl:when test="' . $condition . '"><img src="{IMAGEURL}" class="postimage" alt="{L_IMAGE}"/></xsl:when>' // Taken from \phpbb\textformatter\s9e\factory
+			. '<xsl:otherwise>' . str_replace(array('{URL}', '{DESCRIPTION}'), array('@src', '{L_EXTIMGLINK}'), $configurator->tags['URL']->template) . '</xsl:otherwise>' // Do some hacking
+			. '</xsl:choose>';
+
+		$configurator->tags['IMG']->template = '<xsl:choose>'
+			. '<xsl:when test="$S_VIEWIMG">' . $img_template . '</xsl:when>'
+			. '<xsl:otherwise><xsl:apply-templates/></xsl:otherwise>'
+			. '</xsl:choose>';
 	}
 
 	/**
@@ -160,6 +209,12 @@ class listener implements EventSubscriberInterface
 			$error = $event['error'];
 			$error[] = $this->user->lang('EXTIMGASLINK_INVALID_CONFIG');
 			$event['error'] = $error;
+		}
+		// We successfully validated it, let's update the renderer (and don't break 3.1)
+		else if ($this->container->has('text_formatter.s9e.factory'))
+		{
+			$this->updated = $data;
+			$this->container->get('text_formatter.s9e.factory')->invalidate();
 		}
 	}
 }

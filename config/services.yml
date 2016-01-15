@@ -8,6 +8,7 @@ services:
         class: phpbbde\externalimgaslink\event\listener
         arguments:
             - '@config'
+            - '@service_container'
             - '@phpbbde.externalimgaslink.helper'
             - '@template'
             - '@user'
