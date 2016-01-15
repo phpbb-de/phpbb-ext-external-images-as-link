@@ -105,7 +105,7 @@ class listener implements EventSubscriberInterface
 		);
 
 		$vars = $event['display_vars'];
-		$vars['vars'] = $this->helper->array_insert($vars['vars'], 'allow_post_links', $own_vars);
+		$vars['vars'] = helper::array_insert($vars['vars'], 'allow_post_links', $own_vars);
 		$event['display_vars'] = $vars;
 	}
 

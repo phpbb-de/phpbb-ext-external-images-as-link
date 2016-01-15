@@ -35,7 +35,7 @@ class helper
 	 * @return array
 	 * @access public
 	 */
-	public function array_insert($input, $search_key, $insertion)
+	public static function array_insert($input, $search_key, $insertion)
 	{
 		$offset = array_search($search_key, array_keys($input)) + 1;
 		$first_array = array_splice($input, 0, $offset);
