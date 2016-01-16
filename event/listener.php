@@ -36,9 +36,6 @@ class listener implements EventSubscriberInterface
 	/** @var template */
 	protected $template;
 
-	/** @var string */
-	protected $updated;
-
 	/** @var user */
 	protected $user;
 
@@ -55,7 +52,6 @@ class listener implements EventSubscriberInterface
 		$this->container = $container;
 		$this->helper = $helper;
 		$this->template = $template;
-		$this->updated = '';
 		$this->user = $user;
 
 		$this->user->add_lang_ext('phpbbde/externalimgaslink', 'extimgaslink');
@@ -76,6 +72,7 @@ class listener implements EventSubscriberInterface
 			'core.validate_config_variable'		=> 'validate_config_variable',
 			// 3.2 TextFormatter event (will only trigger in >=3.2)
 			'core.text_formatter_s9e_configure_after'	=> 'configure_textformatter',
+			'core.text_formatter_s9e_renderer_setup'	=> 'setup_textformatter_renderer',
 		);
 	}
 
@@ -121,17 +118,24 @@ class listener implements EventSubscriberInterface
 		/** @var \s9e\TextFormatter\Configurator $configurator */
 		$configurator = $event['configurator'];
 
-		$condition = 'starts-with(@src, \'' . generate_board_url(true) . '\')';
-		$setting = ($this->updated) ? $this->updated : $this->config['extimgaslink_config'];
-		$condition .= ($setting === 'SECURE_SITES') ? ' or starts-with(@src, \'https://\')' : '';
+		$bbcode_monkey = new \s9e\TextFormatter\Plugins\BBCodes\Configurator\BBCodeMonkey($configurator);
 
-		$img_template = '<xsl:choose>'
-			. '<xsl:when test="' . $condition . '"><img src="{IMAGEURL}" class="postimage" alt="{L_IMAGE}"/></xsl:when>' // Taken from \phpbb\textformatter\s9e\factory
-			. '<xsl:otherwise>' . str_replace(array('{URL}', '{DESCRIPTION}'), array('@src', '{L_EXTIMGLINK}'), $configurator->tags['URL']->template) . '</xsl:otherwise>' // Do some hacking
-			. '</xsl:choose>';
+		// Unfortunately, this has to be hardcoded
+		$parsed_img = $bbcode_monkey->create('[IMG src={IMAGEURL;useContent}]', '<img src="{IMAGEURL}" class="postimage" alt="{L_IMAGE}"/>');
+		$configurator->tags['IMG'] = $parsed_img['tag'];
+
+		$condition = 'starts-with(@src, \'' . generate_board_url(true) . '\') or ($S_IMG_SECURE_URLS and starts-with(@src, \'https://\'))';
+
+		// Prepare fetched URL template
+		$url_template = str_replace(array('@url', '<xsl:apply-templates/>'), array('@src', '<xsl:value-of select="$L_EXTIMGLINK"/>'), $configurator->tags['URL']->template);
 
 		$configurator->tags['IMG']->template = '<xsl:choose>'
-			. '<xsl:when test="$S_VIEWIMG">' . $img_template . '</xsl:when>'
+			. '<xsl:when test="$S_VIEWIMG">'
+				. '<xsl:choose>'
+				. '<xsl:when test="' . $condition . '">' . $configurator->tags['IMG']->template . '</xsl:when>'
+				. '<xsl:otherwise>' . $url_template . '</xsl:otherwise>'
+				. '</xsl:choose>'
+			. '</xsl:when>'
 			. '<xsl:otherwise><xsl:apply-templates/></xsl:otherwise>'
 			. '</xsl:choose>';
 	}
@@ -184,6 +188,20 @@ class listener implements EventSubscriberInterface
 	}
 
 	/**
+	 * Setup the TextFormatter Renderer
+	 *
+	 * @param \phpbb\event\data $event
+	 * @return null
+	 * @access public
+	 */
+	public function setup_textformatter_renderer($event)
+	{
+		/** @var \s9e\TextFormatter\Renderer $renderer */
+		$renderer = $event['renderer']->get_renderer();
+		$renderer->setParameter('S_IMG_SECURE_URLS', $this->config['extimgaslink_config'] === 'SECURE_SITES');
+	}
+
+	/**
 	 * Validate the config value set in ACP
 	 *
 	 * @param \phpbb\event\data $event
@@ -209,12 +227,6 @@ class listener implements EventSubscriberInterface
 			$error = $event['error'];
 			$error[] = $this->user->lang('EXTIMGASLINK_INVALID_CONFIG');
 			$event['error'] = $error;
-		}
-		// We successfully validated it, let's update the renderer (and don't break 3.1)
-		else if ($this->container->has('text_formatter.s9e.factory'))
-		{
-			$this->updated = $data;
-			$this->container->get('text_formatter.s9e.factory')->invalidate();
 		}
 	}
 }
