@@ -42,9 +42,11 @@ class listener implements EventSubscriberInterface
 	/**
 	 * Constructor
 	 *
-	 * @param \phpbbde\externalimgaslink\helper	$helper
-	 * @param \phpbb\template\template		$template
-	 * @param \phpbb\user					$user
+	 * @param config		$config
+	 * @param Container 	$container
+	 * @param helper		$helper
+	 * @param template		$template
+	 * @param user			$user
 	 */
 	public function __construct(config $config, Container $container, helper $helper, template $template, user $user)
 	{
