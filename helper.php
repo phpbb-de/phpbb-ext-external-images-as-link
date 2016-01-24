@@ -48,16 +48,16 @@ class helper
 	public function extimgaslink_config_select($selected_type)
 	{
 		$types = array(
-			'SERVER_ONLY',
-			'SECURE_SITES',
+			constants::SERVER_ONLY	=> 'SERVER_ONLY',
+			constants::SECURE_SITES	=> 'SECURE_SITES',
 		);
 
 		$options = '';
 
-		foreach ($types as $type)
+		foreach ($types as $key => $value)
 		{
-			$selected = ($selected_type === $type) ? ' selected="selected"' : '';
-			$options .= '<option value="' . $type . '"' . $selected . '>' . $this->user->lang('EXTIMGASLINK_' . $type) . '</option>';
+			$selected = ($selected_type === $key) ? ' selected="selected"' : '';
+			$options .= '<option value="' . $key . '"' . $selected . '>' . $this->user->lang('EXTIMGASLINK_' . $value) . '</option>';
 		}
 
 		return $options;

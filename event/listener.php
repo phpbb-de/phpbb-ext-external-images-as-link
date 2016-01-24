@@ -15,9 +15,9 @@ namespace phpbbde\externalimgaslink\event;
 use phpbb\config\config;
 use phpbb\template\template;
 use phpbb\user;
+use phpbbde\externalimgaslink\constants;
 use phpbbde\externalimgaslink\helper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\DependencyInjection\Container;
 
 /**
 * Event listener
@@ -26,9 +26,6 @@ class listener implements EventSubscriberInterface
 {
 	/** @var config */
 	protected $config;
-
-	/** @var Container */
-	protected $container;
 
 	/** @var helper */
 	protected $helper;
@@ -48,10 +45,9 @@ class listener implements EventSubscriberInterface
 	 * @param template		$template
 	 * @param user			$user
 	 */
-	public function __construct(config $config, Container $container, helper $helper, template $template, user $user)
+	public function __construct(config $config, helper $helper, template $template, user $user)
 	{
 		$this->config = $config;
-		$this->container = $container;
 		$this->helper = $helper;
 		$this->template = $template;
 		$this->user = $user;
@@ -71,7 +67,6 @@ class listener implements EventSubscriberInterface
 		return array(
 			'core.acp_board_config_edit_add'	=> 'acp_add_config',
 			'core.bbcode_cache_init_end'		=> 'modify_case_img',
-			'core.validate_config_variable'		=> 'validate_config_variable',
 			// 3.2 TextFormatter event (will only trigger in >=3.2)
 			'core.text_formatter_s9e_configure_after'	=> 'configure_textformatter',
 			'core.text_formatter_s9e_renderer_setup'	=> 'setup_textformatter_renderer',
@@ -95,11 +90,11 @@ class listener implements EventSubscriberInterface
 		$own_vars = array(
 			'extimgaslink_config'	=> array(
 				'lang' => 'EXTIMGASLINK_CONFIG',
-				'validate' => 'extimgaslink_config',
+				'validate' => 'int:0',
 				'type' => 'select',
 				'function' => array($this->helper, 'extimgaslink_config_select'),
 				'params' => array('{CONFIG_VALUE}'),
-				'explain' => true
+				'explain' => true,
 			),
 		);
 
@@ -173,7 +168,7 @@ class listener implements EventSubscriberInterface
 			),
 		);
 
-		if ($this->config['extimgaslink_config'] === 'SECURE_SITES')
+		if (($this->config['extimgaslink_config'] & constants::SECURE_SITES) === constants::SECURE_SITES)
 		{
 			$bbcode_cache[$bbcode_id]['preg'] += array(
 				// also display images from secure sites
@@ -200,35 +195,6 @@ class listener implements EventSubscriberInterface
 	{
 		/** @var \s9e\TextFormatter\Renderer $renderer */
 		$renderer = $event['renderer']->get_renderer();
-		$renderer->setParameter('S_IMG_SECURE_URLS', $this->config['extimgaslink_config'] === 'SECURE_SITES');
-	}
-
-	/**
-	 * Validate the config value set in ACP
-	 *
-	 * @param \phpbb\event\data $event
-	 * @return null
-	 * @access public
-	 */
-	public function validate_config_variable($event)
-	{
-		if ($event['config_definition']['validate'] !== 'extimgaslink_config')
-		{
-			return;
-		}
-
-		$types = array(
-			'SERVER_ONLY',
-			'SECURE_SITES',
-		);
-
-		$data = $event['cfg_array'][$event['config_name']];
-
-		if (!in_array($data, $types))
-		{
-			$error = $event['error'];
-			$error[] = $this->user->lang('EXTIMGASLINK_INVALID_CONFIG');
-			$event['error'] = $error;
-		}
+		$renderer->setParameter('S_IMG_SECURE_URLS', ($this->config['extimgaslink_config'] & constants::SECURE_SITES) === constants::SECURE_SITES);
 	}
 }
