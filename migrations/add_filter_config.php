@@ -9,12 +9,14 @@
 
 namespace phpbbde\externalimgaslink\migrations;
 
+use phpbbde\externalimgaslink\constants;
+
 class add_filter_config extends \phpbb\db\migration\migration
 {
 	public function update_data()
 	{
 		return array(
-			array('config.add', array('extimgaslink_config', 'SERVER_ONLY')),
+			array('config.add', array('extimgaslink_config', constants::SERVER_ONLY)),
 		);
 	}
 }
