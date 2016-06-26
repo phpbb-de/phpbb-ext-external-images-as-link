@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# This file is part of the hookup extension for phpBB
+# This file is part of the externalimgaslink extension for phpBB
 #
 # @copyright (c) gn#36
 # @license GNU General Public License, version 2 (GPL-2.0)
