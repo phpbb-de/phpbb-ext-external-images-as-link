@@ -2,7 +2,7 @@
 /**
  *
  * @package phpBB.de External Images as link
- * @copyright (c) 2015 phpBB.de
+ * @copyright (c) 2015-2016 phpBB.de
  * @license http://opensource.org/licenses/gpl-2.0.php GNU General Public License v2
  *
  */
@@ -12,6 +12,11 @@ namespace phpbbde\externalimgaslink\event;
 /**
 * @ignore
 */
+use phpbb\config\config;
+use phpbb\template\template;
+use phpbb\user;
+use phpbbde\externalimgaslink\constants;
+use phpbbde\externalimgaslink\helper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -19,44 +24,123 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 */
 class listener implements EventSubscriberInterface
 {
-	/** @var \phpbb\template\template */
+	/** @var config */
+	protected $config;
+
+	/** @var helper */
+	protected $helper;
+
+	/** @var template */
 	protected $template;
 
-	/** @var \phpbb\user */
+	/** @var user */
 	protected $user;
 
 	/**
-	* Constructor
-	*
-	* @param \phpbb\user $user, \phpbb\template\template $template
-	*/
-	public function __construct(\phpbb\user $user, \phpbb\template\template $template)
+	 * Constructor
+	 *
+	 * @param config		$config
+	 * @param Container 	$container
+	 * @param helper		$helper
+	 * @param template		$template
+	 * @param user			$user
+	 */
+	public function __construct(config $config, helper $helper, template $template, user $user)
 	{
-		$this->user = $user;
+		$this->config = $config;
+		$this->helper = $helper;
 		$this->template = $template;
+		$this->user = $user;
 
 		$this->user->add_lang_ext('phpbbde/externalimgaslink', 'extimgaslink');
 	}
 
 	/**
-	* Assign functions defined in this class to event listeners in the core
-	*
-	* @return array
-	* @static
-	* @access public
-	*/
+	 * Assign functions defined in this class to event listeners in the core
+	 *
+	 * @return array
+	 * @static
+	 * @access public
+	 */
 	static public function getSubscribedEvents()
 	{
 		return array(
-			'core.bbcode_cache_init_end'	=> 'modify_case_img',
+			'core.acp_board_config_edit_add'	=> 'acp_add_config',
+			'core.bbcode_cache_init_end'		=> 'modify_case_img',
+			// 3.2 TextFormatter event (will only trigger in >=3.2)
+			'core.text_formatter_s9e_configure_after'	=> 'configure_textformatter',
+			'core.text_formatter_s9e_renderer_setup'	=> 'setup_textformatter_renderer',
 		);
 	}
 
+	/**
+	 * Adds settings for this extension to the ACP
+	 *
+	 * @param \phpbb\event\data $event
+	 * @return null
+	 * @access public
+	 */
+	public function acp_add_config($event)
+	{
+		if ($event['mode'] !== 'post')
+		{
+			return;
+		}
+
+		$own_vars = array(
+			'extimgaslink_config'	=> array(
+				'lang' => 'EXTIMGASLINK_CONFIG',
+				'validate' => 'int:0',
+				'type' => 'select',
+				'function' => array($this->helper, 'extimgaslink_config_select'),
+				'params' => array('{CONFIG_VALUE}'),
+				'explain' => true,
+			),
+		);
+
+		$vars = $event['display_vars'];
+		$vars['vars'] = helper::array_insert($vars['vars'], 'allow_post_links', $own_vars);
+		$event['display_vars'] = $vars;
+	}
+
+	/**
+	 * Configures the textformatter
+	 *
+	 * @param \phpbb\event\data $event
+	 * @return null
+	 * @access public
+	 */
+	public function configure_textformatter($event)
+	{
+		/** @var \s9e\TextFormatter\Configurator $configurator */
+		$configurator = $event['configurator'];
+
+		$bbcode_monkey = new \s9e\TextFormatter\Plugins\BBCodes\Configurator\BBCodeMonkey($configurator);
+
+		// Unfortunately, this has to be hardcoded
+		$parsed_img = $bbcode_monkey->create('[IMG src={IMAGEURL;useContent}]', '<img src="{IMAGEURL}" class="postimage" alt="{L_IMAGE}"/>');
+		$configurator->tags['IMG'] = $parsed_img['tag'];
+
+		$condition = 'starts-with(@src, \'' . generate_board_url(true) . '\') or ($S_IMG_SECURE_URLS and starts-with(@src, \'https://\'))';
+
+		// Prepare fetched URL template
+		$url_template = str_replace(array('@url', '<xsl:apply-templates/>'), array('@src', '<xsl:value-of select="$L_EXTIMGLINK"/>'), $configurator->tags['URL']->template);
+
+		$configurator->tags['IMG']->template = '<xsl:choose>'
+			. '<xsl:when test="$S_VIEWIMG">'
+				. '<xsl:choose>'
+				. '<xsl:when test="' . $condition . '">' . $configurator->tags['IMG']->template . '</xsl:when>'
+				. '<xsl:otherwise>' . $url_template . '</xsl:otherwise>'
+				. '</xsl:choose>'
+			. '</xsl:when>'
+			. '<xsl:otherwise><xsl:apply-templates/></xsl:otherwise>'
+			. '</xsl:choose>';
+	}
 
 	/**
 	 * Changes the regex replacement for second pass
 	 *
-	 * @param object $event
+	 * @param \phpbb\event\data $event
 	 * @return null
 	 * @access public
 	 */
@@ -77,17 +161,40 @@ class listener implements EventSubscriberInterface
 		$bbcode->template_bitfield = new \bitfield($this->user->style['bbcode_bitfield']);
 		$bbcode->template_filename = $this->template->get_source_file_for_handle('bbcode.html');
 
-		$extimgaslink_boardurl = generate_board_url(true) . '/';
-
 		$bbcode_cache[$bbcode_id] = array(
 			'preg' => array(
 				// display only images from own board url
-				'#\[img:$uid\]('. preg_quote($extimgaslink_boardurl, '#') . '.*?)\[/img:$uid\]#s'	=> $bbcode->bbcode_tpl('img', $bbcode_id),
-				// every other external image will be replaced
-				'#\[img:$uid\](.*?)\[/img:$uid\]#s' 	=> str_replace('$2', $this->user->lang('EXTIMGLINK'), $bbcode->bbcode_tpl('url', $bbcode_id, true)),
-			)
+				'#\[img:$uid\]('. preg_quote(generate_board_url(true) . '/', '#') . '.*?)\[/img:$uid\]#s'	=> $bbcode->bbcode_tpl('img', $bbcode_id),
+			),
+		);
+
+		if (($this->config['extimgaslink_config'] & constants::SECURE_SITES) === constants::SECURE_SITES)
+		{
+			$bbcode_cache[$bbcode_id]['preg'] += array(
+				// also display images from secure sites
+				'#\[img:$uid\](https://.*?)\[/img:$uid\]#s'	=> $bbcode->bbcode_tpl('img', $bbcode_id),
+			);
+		}
+
+		$bbcode_cache[$bbcode_id]['preg'] += array(
+			// every other external image will be replaced
+			'#\[img:$uid\](.*?)\[/img:$uid\]#s'	=> str_replace('$2', $this->user->lang('EXTIMGLINK'), $bbcode->bbcode_tpl('url', $bbcode_id, true)),
 		);
 
 		$event['bbcode_cache'] = $bbcode_cache;
+	}
+
+	/**
+	 * Setup the TextFormatter Renderer
+	 *
+	 * @param \phpbb\event\data $event
+	 * @return null
+	 * @access public
+	 */
+	public function setup_textformatter_renderer($event)
+	{
+		/** @var \s9e\TextFormatter\Renderer $renderer */
+		$renderer = $event['renderer']->get_renderer();
+		$renderer->setParameter('S_IMG_SECURE_URLS', ($this->config['extimgaslink_config'] & constants::SECURE_SITES) === constants::SECURE_SITES);
 	}
 }
