@@ -6,16 +6,16 @@ Author: Christian Schnegelberger, Oliver Schramm
 
 URL: https://www.phpbb.de
 
-Version: 1.0.0
+Version: 1.1.0
 
 ## Install instructions:
 1. Download the extension
-2. Copy the whole archive content to: phpBB/phpbbde/externalimgaslink
+2. Copy the whole archive content to: /ext/phpbbde/externalimgaslink
 3. Go to your phpBB-Board > Admin Control Panel > Customise > Manage extensions > phpBB.de - External Images as Link: enable
 
 ## Update instructions:
 1. Go to you phpBB-Board > Admin Control Panel > Customise > Manage extensions > phpBB.de - External Images as Link: disable
-2. Delete all files of the extension from phpBB/phpbbde/externalimgaslink
+2. Delete all files of the extension from /ext/phpbbde/externalimgaslink
 3. Upload all the new files to the same locations
 4. Go to you phpBB-Board > Admin Control Panel > Customise > Manage extensions > phpBB.de - External Images as Link: enable
 5. Purge the board cache

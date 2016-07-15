@@ -4,8 +4,8 @@
 * External Image as link [Arabic]
 *
 * @package language
-* @version 1.0.0
-* @copyright (c) 2015 phpbb.de
+* @version 1.1.0
+* @copyright (c) 2016 phpbb.de
 * @license http://opensource.org/licenses/gpl-license.php GNU Public License
 *
 * Translated By : Bassel Taha Alhitary - www.alhitary.net
