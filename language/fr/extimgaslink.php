@@ -3,8 +3,8 @@
 *
 * External Image as Link extension for the phpBB Forum Software package.
 * French translation by Galixte (http://www.galixte.com)
-*
-* @copyright (c) 2015 phpbb.de
+* @version 1.1.0
+* @copyright (c) 2016 phpbb.de
 * @license http://opensource.org/licenses/gpl-license.php GNU Public License
 *
 */
