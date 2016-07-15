@@ -1,4 +1,4 @@
-# phpBB 3.1 Extension - phpBB.de External Images as Link
+# phpBB 3.1/3.2 Extension - phpBB.de External Images as Link
 
 Images which are not from the own board are displayed as link not as image.
 
