@@ -67,7 +67,7 @@ class listener implements EventSubscriberInterface
 		return array(
 			'core.acp_board_config_edit_add'	=> 'acp_add_config',
 			'core.bbcode_cache_init_end'		=> 'modify_case_img',
-			// 3.2 TextFormatter event (will only trigger in >=3.2)
+			// 3.2 TextFormatter events (will only trigger in >=3.2)
 			'core.text_formatter_s9e_configure_after'	=> 'configure_textformatter',
 			'core.text_formatter_s9e_renderer_setup'	=> 'setup_textformatter_renderer',
 		);
@@ -115,25 +115,14 @@ class listener implements EventSubscriberInterface
 		/** @var \s9e\TextFormatter\Configurator $configurator */
 		$configurator = $event['configurator'];
 
-		$bbcode_monkey = new \s9e\TextFormatter\Plugins\BBCodes\Configurator\BBCodeMonkey($configurator);
-
-		// Unfortunately, this has to be hardcoded
-		$parsed_img = $bbcode_monkey->create('[IMG src={IMAGEURL;useContent}]', '<img src="{IMAGEURL}" class="postimage" alt="{L_IMAGE}"/>');
-		$configurator->tags['IMG'] = $parsed_img['tag'];
-
 		$condition = 'starts-with(@src, \'' . generate_board_url(true) . '\') or ($S_IMG_SECURE_URLS and starts-with(@src, \'https://\'))';
 
 		// Prepare fetched URL template
 		$url_template = str_replace(array('@url', '<xsl:apply-templates/>'), array('@src', '<xsl:value-of select="$L_EXTIMGLINK"/>'), $configurator->tags['URL']->template);
 
 		$configurator->tags['IMG']->template = '<xsl:choose>'
-			. '<xsl:when test="$S_VIEWIMG">'
-				. '<xsl:choose>'
 				. '<xsl:when test="' . $condition . '">' . $configurator->tags['IMG']->template . '</xsl:when>'
 				. '<xsl:otherwise>' . $url_template . '</xsl:otherwise>'
-				. '</xsl:choose>'
-			. '</xsl:when>'
-			. '<xsl:otherwise><xsl:apply-templates/></xsl:otherwise>'
 			. '</xsl:choose>';
 	}
 
