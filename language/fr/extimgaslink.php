@@ -40,8 +40,8 @@ if (empty($lang) || !is_array($lang))
 
 $lang = array_merge($lang, array(
 	'EXTIMGASLINK_CONFIG'			=> 'Images acceptées',
-	'EXTIMGASLINK_CONFIG_EXPLAIN'	=> 'Permet d’autoriser l’affichage des images provenant uniquement du nom de domaine de ce forum, ou depuis ce forum ainsi que depuis des sites Web externes et sécurisés. L’affichage des autres images sera remplacé par des liens.',
-	'EXTIMGASLINK_INVALID_CONFIG'	=> 'L’origine de l’image indiqué est invalide.',
+	'EXTIMGASLINK_CONFIG_EXPLAIN'	=> 'Permet d’afficher uniquement les images provenant du nom de domaine de ce forum ou depuis des sites Web externes au forum mais sécurisés. L’affichage des autres images sera remplacé par des liens.',
+	'EXTIMGASLINK_INVALID_CONFIG'	=> 'L’origine de l’image indiquée est invalide.',
 	'EXTIMGASLINK_SECURE_SITES'		=> 'Seulement les images provenant de sites Web sécurisés et depuis ce nom de domaine',
 	'EXTIMGASLINK_SERVER_ONLY'		=> 'Seulement les images provenant de ce nom de domaine',
 
