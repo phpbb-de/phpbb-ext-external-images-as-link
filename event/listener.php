@@ -40,7 +40,6 @@ class listener implements EventSubscriberInterface
 	 * Constructor
 	 *
 	 * @param config		$config
-	 * @param Container 	$container
 	 * @param helper		$helper
 	 * @param template		$template
 	 * @param user			$user
@@ -59,8 +58,6 @@ class listener implements EventSubscriberInterface
 	 * Assign functions defined in this class to event listeners in the core
 	 *
 	 * @return array
-	 * @static
-	 * @access public
 	 */
 	static public function getSubscribedEvents()
 	{
@@ -78,7 +75,6 @@ class listener implements EventSubscriberInterface
 	 *
 	 * @param \phpbb\event\data $event
 	 * @return null
-	 * @access public
 	 */
 	public function acp_add_config($event)
 	{
@@ -108,7 +104,6 @@ class listener implements EventSubscriberInterface
 	 *
 	 * @param \phpbb\event\data $event
 	 * @return null
-	 * @access public
 	 */
 	public function configure_textformatter($event)
 	{
@@ -135,7 +130,6 @@ class listener implements EventSubscriberInterface
 	 *
 	 * @param \phpbb\event\data $event
 	 * @return null
-	 * @access public
 	 */
 	public function modify_case_img($event)
 	{
@@ -182,7 +176,6 @@ class listener implements EventSubscriberInterface
 	 *
 	 * @param \phpbb\event\data $event
 	 * @return null
-	 * @access public
 	 */
 	public function setup_textformatter_renderer($event)
 	{
