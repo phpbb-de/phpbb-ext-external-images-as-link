@@ -117,13 +117,17 @@ class listener implements EventSubscriberInterface
 
 		$condition = 'starts-with(@src, \'' . generate_board_url(true) . '\') or ($S_IMG_SECURE_URLS and starts-with(@src, \'https://\'))';
 
-		// Prepare fetched URL template
+		// Prepare URL template
 		$url_template = str_replace(array('@url', '<xsl:apply-templates/>'), array('@src', '<xsl:value-of select="$L_EXTIMGLINK"/>'), $configurator->tags['URL']->template);
 
 		$configurator->tags['IMG']->template = '<xsl:choose>'
 				. '<xsl:when test="' . $condition . '">' . $configurator->tags['IMG']->template . '</xsl:when>'
 				. '<xsl:otherwise>' . $url_template . '</xsl:otherwise>'
 			. '</xsl:choose>';
+
+		// Fix behaviour when [img] tag is within [url] tag
+		$configurator->tags['URL']->rules->allowChild('IMG');
+		$configurator->tags['URL']->rules->allowDescendant('IMG');
 	}
 
 	/**
