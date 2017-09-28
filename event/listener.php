@@ -110,7 +110,14 @@ class listener implements EventSubscriberInterface
 		/** @var \s9e\TextFormatter\Configurator $configurator */
 		$configurator = $event['configurator'];
 
-		$condition = 'starts-with(@src, \'' . generate_board_url(true) . '\') or ($S_IMG_SECURE_URLS and starts-with(@src, \'https://\'))';
+		$board_url = generate_board_url(true);
+		$condition = 'starts-with(@src, \'' . $board_url . '\') or ($S_IMG_SECURE_URLS and starts-with(@src, \'https://\'))';
+		if (substr($board_url, 0, 7) === 'http://')
+		{
+			// We won't allow the reverse as that would defeat the whole purpose of this extension
+			$board_url = 'https' . substr($board_url, 4);
+			$condition .= ' or starts-with(@src, \'' . $board_url . '\')';
+		}
 
 		// Prepare URL template
 		$url_template = str_replace(array('@url', '<xsl:apply-templates/>'), array('@src', '<xsl:value-of select="$L_EXTIMGLINK"/>'), $configurator->tags['URL']->template);
@@ -148,12 +155,24 @@ class listener implements EventSubscriberInterface
 		$bbcode->template_bitfield = new \bitfield($this->user->style['bbcode_bitfield']);
 		$bbcode->template_filename = $this->template->get_source_file_for_handle('bbcode.html');
 
+		$board_url = generate_board_url(true);
+
 		$bbcode_cache[$bbcode_id] = array(
 			'preg' => array(
 				// display only images from own board url
-				'#\[img:$uid\]('. preg_quote(generate_board_url(true) . '/', '#') . '.*?)\[/img:$uid\]#s'	=> $bbcode->bbcode_tpl('img', $bbcode_id),
+				'#\[img:$uid\]('. preg_quote($board_url . '/', '#') . '.*?)\[/img:$uid\]#s'	=> $bbcode->bbcode_tpl('img', $bbcode_id),
 			),
 		);
+
+		if (substr($board_url, 0, 7) === 'http://')
+		{
+			// We won't allow the reverse as that would defeat the whole purpose of this extension
+			$board_url = 'https' . substr($board_url, 4);
+
+			$bbcode_cache[$bbcode_id]['preg'] += array(
+				'#\[img:$uid\]('. preg_quote($board_url . '/', '#') . '.*?)\[/img:$uid\]#s'	=> $bbcode->bbcode_tpl('img', $bbcode_id),
+			);
+		}
 
 		if (($this->config['extimgaslink_config'] & constants::SECURE_SITES) === constants::SECURE_SITES)
 		{
