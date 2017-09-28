@@ -40,7 +40,6 @@ class listener implements EventSubscriberInterface
 	 * Constructor
 	 *
 	 * @param config		$config
-	 * @param Container 	$container
 	 * @param helper		$helper
 	 * @param template		$template
 	 * @param user			$user
@@ -59,8 +58,6 @@ class listener implements EventSubscriberInterface
 	 * Assign functions defined in this class to event listeners in the core
 	 *
 	 * @return array
-	 * @static
-	 * @access public
 	 */
 	static public function getSubscribedEvents()
 	{
@@ -78,7 +75,6 @@ class listener implements EventSubscriberInterface
 	 *
 	 * @param \phpbb\event\data $event
 	 * @return null
-	 * @access public
 	 */
 	public function acp_add_config($event)
 	{
@@ -108,7 +104,6 @@ class listener implements EventSubscriberInterface
 	 *
 	 * @param \phpbb\event\data $event
 	 * @return null
-	 * @access public
 	 */
 	public function configure_textformatter($event)
 	{
@@ -117,13 +112,17 @@ class listener implements EventSubscriberInterface
 
 		$condition = 'starts-with(@src, \'' . generate_board_url(true) . '\') or ($S_IMG_SECURE_URLS and starts-with(@src, \'https://\'))';
 
-		// Prepare fetched URL template
+		// Prepare URL template
 		$url_template = str_replace(array('@url', '<xsl:apply-templates/>'), array('@src', '<xsl:value-of select="$L_EXTIMGLINK"/>'), $configurator->tags['URL']->template);
 
 		$configurator->tags['IMG']->template = '<xsl:choose>'
 				. '<xsl:when test="' . $condition . '">' . $configurator->tags['IMG']->template . '</xsl:when>'
 				. '<xsl:otherwise>' . $url_template . '</xsl:otherwise>'
 			. '</xsl:choose>';
+
+		// Fix behaviour when [img] tag is within [url] tag
+		$configurator->tags['URL']->rules->allowChild('IMG');
+		$configurator->tags['URL']->rules->allowDescendant('IMG');
 	}
 
 	/**
@@ -131,7 +130,6 @@ class listener implements EventSubscriberInterface
 	 *
 	 * @param \phpbb\event\data $event
 	 * @return null
-	 * @access public
 	 */
 	public function modify_case_img($event)
 	{
@@ -178,7 +176,6 @@ class listener implements EventSubscriberInterface
 	 *
 	 * @param \phpbb\event\data $event
 	 * @return null
-	 * @access public
 	 */
 	public function setup_textformatter_renderer($event)
 	{
