@@ -6,7 +6,7 @@ Author: Christian Schnegelberger, Oliver Schramm
 
 URL: https://www.phpbb.de
 
-Version: 1.1.0
+Version: 1.2.0
 
 ## Install instructions:
 1. Download the extension
