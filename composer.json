@@ -5,7 +5,7 @@
 	"homepage": "https://github.com/phpbb-de/phpbb-ext-external-images-as-link",
 	"version": "1.2.0",
 	"time": "2018-01-22",
-	"license": "GPL-2.0",
+	"license": "GPL-2.0-only",
 	"authors": [
 		{
 			"name": "Christian Schnegelberger",
