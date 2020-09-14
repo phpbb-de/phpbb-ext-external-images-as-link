@@ -30,6 +30,9 @@ class listener implements EventSubscriberInterface
 	/** @var helper */
 	protected $helper;
 
+	/* @var \phpbb\language\language */
+	protected $language;
+
 	/** @var template */
 	protected $template;
 
@@ -39,19 +42,19 @@ class listener implements EventSubscriberInterface
 	/**
 	 * Constructor
 	 *
-	 * @param config		$config
-	 * @param helper		$helper
-	 * @param template		$template
-	 * @param user			$user
+	 * @param \phpbb\config\config				$config
+	 * @param helper							$helper
+	 * @param \phpbb\language\language			$language
+	 * @param \phpbb\template\template			$template
+	 * @param \phpbb\user						$user
 	 */
-	public function __construct(config $config, helper $helper, template $template, user $user)
+	public function __construct(\phpbb\config\config $config, helper $helper, \phpbb\language\language $language, \phpbb\template\template $template, \phpbb\user $user)
 	{
 		$this->config = $config;
 		$this->helper = $helper;
+		$this->language = $language;
 		$this->template = $template;
 		$this->user = $user;
-
-		$this->user->add_lang_ext('phpbbde/externalimgaslink', 'extimgaslink');
 	}
 
 	/**
@@ -64,7 +67,6 @@ class listener implements EventSubscriberInterface
 		return array(
 			'core.acp_board_config_edit_add'	=> 'acp_add_config',
 			'core.bbcode_cache_init_end'		=> 'modify_case_img',
-			// 3.2 TextFormatter events (will only trigger in >=3.2)
 			'core.text_formatter_s9e_configure_after'	=> 'configure_textformatter',
 			'core.text_formatter_s9e_renderer_setup'	=> 'setup_textformatter_renderer',
 		);
@@ -78,6 +80,8 @@ class listener implements EventSubscriberInterface
 	 */
 	public function acp_add_config($event)
 	{
+		$this->language->add_lang('extimgaslink', 'phpbbde/externalimgaslink');
+
 		if ($event['mode'] !== 'post')
 		{
 			return;
@@ -165,7 +169,7 @@ class listener implements EventSubscriberInterface
 
 		$bbcode_cache[$bbcode_id]['preg'] += array(
 			// every other external image will be replaced
-			'#\[img:$uid\](.*?)\[/img:$uid\]#s'	=> str_replace('$2', $this->user->lang('EXTIMGLINK'), $bbcode->bbcode_tpl('url', $bbcode_id, true)),
+			'#\[img:$uid\](.*?)\[/img:$uid\]#s'	=> str_replace('$2', $this->language->lang('EXTIMGLINK'), $bbcode->bbcode_tpl('url', $bbcode_id, true)),
 		);
 
 		$event['bbcode_cache'] = $bbcode_cache;

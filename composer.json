@@ -9,7 +9,7 @@
 	"authors": [
 		{
 			"name": "Christian Schnegelberger",
-			"email": "blackhawk87@phpbb.de",
+			"email": "crizzo@phpbb.de",
 			"homepage": "https://www.phpbb.de",
 			"role": "Developer"
 		},
@@ -24,13 +24,13 @@
 		"php": ">=5.4.7"
 	},
 	"require-dev": {
-		"phpbb/epv": "~0.0.8",
-		"phpbb/translation-validator": "~1.4.0"
+		"phpbb/epv": "^0.0.11",
+		"phpbb/translation-validator": "^1.5.2"
 	},
 	"extra": {
 		"display-name": "phpBB.de - External Image as Link",
 		"soft-require": {
-			"phpbb/phpbb": ">=3.2.2"
+			"phpbb/phpbb": ">=3.2.4"
 		}
 	}
 }

@@ -11,17 +11,17 @@ namespace phpbbde\externalimgaslink;
 
 class helper
 {
-	/** @var \phpbb\user */
-	protected $user;
+	/* @var \phpbb\language\language */
+	protected $language;
 
 	/**
 	 * Constructor
 	 *
-	 * @param \phpbb\user $user
+	 * @param \phpbb\language\language		$language
 	 */
-	public function __construct(\phpbb\user $user)
+	public function __construct(\phpbb\language\language $language)
 	{
-		$this->user = $user;
+		$this->language = $language;
 	}
 
 	/**
@@ -57,7 +57,7 @@ class helper
 		foreach ($types as $key => $value)
 		{
 			$selected = ($selected_type === $key) ? ' selected="selected"' : '';
-			$options .= '<option value="' . $key . '"' . $selected . '>' . $this->user->lang('EXTIMGASLINK_' . $value) . '</option>';
+			$options .= '<option value="' . $key . '"' . $selected . '>' . $this->language->lang('EXTIMGASLINK_' . $value) . '</option>';
 		}
 
 		return $options;
