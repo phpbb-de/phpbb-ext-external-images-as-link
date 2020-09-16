@@ -48,7 +48,12 @@ class listener implements EventSubscriberInterface
 	 * @param \phpbb\template\template			$template
 	 * @param \phpbb\user						$user
 	 */
-	public function __construct(\phpbb\config\config $config, helper $helper, \phpbb\language\language $language, \phpbb\template\template $template, \phpbb\user $user)
+	public function __construct(
+		\phpbb\config\config $config,
+		helper $helper,
+		\phpbb\language\language $language,
+		\phpbb\template\template $template,
+		\phpbb\user $user)
 	{
 		$this->config = $config;
 		$this->helper = $helper;
