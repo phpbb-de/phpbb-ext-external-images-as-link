@@ -3,8 +3,8 @@
 	"type": "phpbb-extension",
 	"description": "Displays every image as a link, which is included with [img] bbcode and not hosted with the own board.",
 	"homepage": "https://github.com/phpbb-de/phpbb-ext-external-images-as-link",
-	"version": "1.2.0",
-	"time": "2018-01-22",
+	"version": "1.2.1",
+	"time": "2020-09-16",
 	"license": "GPL-2.0-only",
 	"authors": [
 		{
