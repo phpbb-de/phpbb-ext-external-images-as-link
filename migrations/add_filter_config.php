@@ -13,6 +13,13 @@ use phpbbde\externalimgaslink\constants;
 
 class add_filter_config extends \phpbb\db\migration\migration
 {
+	static public function depends_on()
+	{
+		return array(
+			'\phpbb\db\migration\data\v32x\v324',
+		);
+	}
+
 	public function update_data()
 	{
 		return array(
