@@ -1,4 +1,4 @@
-# phpBB 3.1/3.2 Extension - phpBB.de External Images as Link
+# phpBB 3.2 & 3.3 Extension - phpBB.de External Images as Link
 
 Images which are not from the own board are displayed as link not as image.
 
@@ -6,7 +6,12 @@ Author: Christian Schnegelberger, Oliver Schramm
 
 URL: https://www.phpbb.de
 
-Version: 1.2.0
+## New settings
+This extension add a new setting to: "ACP > Tab: General > Post settings > Permitted images". 
+
+You choose between allowed images "Only images from
+this domain" and "Only from secure websites and this domain". The last option will allow to include 
+"https://" image urls.
 
 ## Install instructions:
 1. Download the extension
