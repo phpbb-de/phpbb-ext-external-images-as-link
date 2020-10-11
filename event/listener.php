@@ -74,7 +74,20 @@ class listener implements EventSubscriberInterface
 			'core.bbcode_cache_init_end'		=> 'modify_case_img',
 			'core.text_formatter_s9e_configure_after'	=> 'configure_textformatter',
 			'core.text_formatter_s9e_renderer_setup'	=> 'setup_textformatter_renderer',
+			'core.user_setup'					=> 'load_language_on_setup',
 		);
+	}
+
+	// Add lang keys of this extension
+	public function load_language_on_setup($event)
+	{
+		$lang_set_ext = $event['lang_set_ext'];
+		$lang_set_ext[] = array(
+				'ext_name' => 'phpbbde/externalimgaslink',
+				'lang_set' => 'extimgaslink',
+			);
+
+		$event['lang_set_ext'] = $lang_set_ext;
 	}
 
 	/**
