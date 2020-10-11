@@ -188,6 +188,8 @@ class listener implements EventSubscriberInterface
 	 */
 	public function setup_textformatter_renderer($event)
 	{
+		$this->language->add_lang('extimgaslink', 'phpbbde/externalimgaslink');
+
 		/** @var \s9e\TextFormatter\Renderer $renderer */
 		$renderer = $event['renderer']->get_renderer();
 		$renderer->setParameter('S_IMG_SECURE_URLS', ($this->config['extimgaslink_config'] & constants::SECURE_SITES) === constants::SECURE_SITES);
