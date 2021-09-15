@@ -27,9 +27,6 @@ this domain" and "Only from secure websites and this domain". The last option wi
 
 ## Automated Testing
 
-We use automated unit tests to prevent regressions. Check out our travis build below:
-
-master: [![Build Status](https://travis-ci.org/phpbb-de/phpbb-ext-external-images-as-link.png?branch=master)](http://travis-ci.org/phpbb-de/phpbb-ext-external-images-as-link)
 
 ## License
 
